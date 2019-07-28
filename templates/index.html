@@ -1,0 +1,50 @@
+{% extends "master.html" %}
+
+{% import 'macros.html' as macros %}
+
+{% block title %}
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    {{ macros.showflashes(category=['error'], alert_type='alert-danger') }}
+    {{ macros.showflashes(category=['success'], alert_type='alert-success') }}
+
+    {# This is an example call to the card() macro #}
+    {# You can choose to not specify an image or width #}
+    <div class="row">
+        <div class="col">
+            {% call macros.card(header='Card hearder', title='Card title', footer='some footer', img={'src': 'static/img/nothing.png', 'alt': 'nothing'}, width='15rem') -%}
+            Card content
+            {%- endcall %}
+        </div>
+        <div class="col">
+            {{macros.inputfield(name='firstname', label='First name', placeholder='Jane')}}
+            {{macros.inputfield(name='lastname', label='Last name', placeholder='Doe')}}
+            {{macros.inputfield(name='email', label='Email', placeholder='example@domain.net')}}
+        </div>
+    </div>
+
+    <p></p>
+
+    {% call macros.card() -%}
+    <p>Another card here</p>
+    <a href="/" class="btn btn-primary">Go somewhere</a>
+    {%- endcall %}
+
+    <p></p>
+
+    {# Now we present a nice table #}
+    {# Basically, all table data can be easily populated from a list of dictionaries #}
+    {# Since a list of dictionaries is the output of a MySQL SELECT query this nicely fits it #}
+    {# So you can use the query output directly, and identify the columns you want to present, giving them names #}
+    {# Here's an example: #}
+    {# macros.table(data=db_query_output, header=[['Column 1', 'db_col_1'], ['Column 2', 'db_col_2'], ...]) #}
+    {{ macros.table(header=[['#', 'id'], ['Data', 'db_col_name'], ['Non-existent column', 'db_another_col']]) }}
+
+</div>
+{% endblock %}
+
+{% block morescripts %}
+{% endblock %}
+

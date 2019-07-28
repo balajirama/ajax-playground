@@ -1,0 +1,68 @@
+
+
+{% macro showflashes(alert_type='alert-danger', category=['error']) -%}
+    {% with errors = get_flashed_messages(category_filter=category) %}
+    {% for message in errors %}
+    <div class="alert {{alert_type}}" role="alert">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+    {% endwith %}
+{%- endmacro %}
+
+
+{% macro inputfield(name, label, value='', type='text', placeholder='', small_text=None) -%}
+    {% set input_id = 'input_' + name %}
+    <div class="form-group">
+        <label>{{label}}</label>
+        {{ showflashes(category=[name]) }}
+        <input type="{{type}}" class="form-control" id="{{input_id}}" name="{{name}}" placeholder="{{placeholder}}" value="{{value}}">
+        {% if small_text != None %}<small class='form-text text-muted'>{{small_text}}</small>{% endif %}
+    </div>
+{%- endmacro %}
+
+{% macro card(header=None, title='Title', footer=None, img=None, width=None, text_align='') -%}
+    {% if width != None %}
+        {% set style_str = "width: " + width + ";" %}
+    {% endif %}
+    <div class="card {{text_align}}" style="{{style_str}}">
+        {%if header!=None%}<div class="card-header">{{header}}</div>{%endif%}
+        {% if img != None -%}
+        <img src="{{img['src']}}" class="card-img-top" alt="{{img['alt']}}">
+        {%- endif %}
+        <div class="card-body">
+            <h5 class="card-title">{{title}}</h5>
+            {{ caller() }}
+        </div>
+        {%if footer!=None%}<div class="card-footer text-muted">{{footer}}</div>{%endif%}
+    </div>
+{%- endmacro %}
+
+{% macro table(table_class='table-striped', header=[['#', 'id'], ['Data', 'db_col_name']], data=[{'id': 1, 'db_col_name': 'Data for 1', 'more': 'stuff', 'another': 'stuff'}, {'id':2, 'db_col_name':'Data for 2', 'more': 'stuff', 'another':'stuff'}]) -%}
+    <table class="table {{table_class}}">
+        <thead class="thead-light">
+            <tr>
+                {% for colheader in header -%}
+                <th scope="col">{{colheader[0]|safe}}</th>
+                {%- endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in data -%}
+            <tr>
+                {% for i in range(header|length) -%}
+                    {% set key = header[i][1] %}
+                    {% if i == 0 -%}
+                        <th scope="row">{{row[key]|safe}}</th>
+                    {%- else %}
+                        <td>{{row[key]|safe}}</td>
+                    {%- endif %}
+                {%- endfor %}
+            </tr>
+            {%- endfor %}
+        </tbody>
+    </table>
+{%- endmacro %}
