@@ -13,15 +13,23 @@
     {# This is an example call to the card() macro #}
     {# You can choose to not specify an image or width #}
     <div class="row">
-        <div class="col">
+        <div class="col my-4">
             {% call macros.card(header='Card hearder', title='Card title', footer='some footer', img={'src': 'static/img/nothing.png', 'alt': 'nothing'}, width='15rem') -%}
             Card content
             {%- endcall %}
         </div>
         <div class="col">
-            {{macros.inputfield(name='firstname', label='First name', placeholder='Jane')}}
-            {{macros.inputfield(name='lastname', label='Last name', placeholder='Doe')}}
-            {{macros.inputfield(name='email', label='Email', placeholder='example@domain.net')}}
+            <form action="/register" method="POST" id="regnForm" class="my-4">
+            {{macros.inputfield(name='username', label='Select a username', placeholder='username')}}
+            {{macros.inputfield(name='password', label='Password', placeholder='Password', type='password')}}
+            {{macros.inputfield(name='confirm', label='Confirm Password', placeholder='Password', type='password')}}
+            <button class="btn btn-primary" type="submit" id="register">Register</button>
+            </form>
+            <div class="overflow-auto" style="height: 150px; border: 1px solid lightgray; border-radius: 5px;">
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Eu volutpat odio facilisis mauris sit. Netus et malesuada fames ac turpis egestas. Elementum tempus egestas sed sed risus pretium quam. Sit amet nulla facilisi morbi tempus iaculis urna id. Sed viverra ipsum nunc aliquet. Natoque penatibus et magnis dis parturient montes nascetur ridiculus mus. Et netus et malesuada fames ac turpis egestas. Nullam ac tortor vitae purus. Amet commodo nulla facilisi nullam. Eget velit aliquet sagittis id consectetur purus ut.</p>
+                <p>Tellus cras adipiscing enim eu turpis. Morbi tristique senectus et netus et. Arcu vitae elementum curabitur vitae nunc sed velit dignissim. Ullamcorper sit amet risus nullam eget felis eget nunc. Convallis convallis tellus id interdum velit laoreet. Lacus sed turpis tincidunt id aliquet. Felis eget nunc lobortis mattis. Sit amet aliquam id diam. Elementum nibh tellus molestie nunc. At risus viverra adipiscing at. Nullam vehicula ipsum a arcu cursus vitae congue mauris rhoncus. Morbi tristique senectus et netus et malesuada fames.</p>
+                <p>Vel orci porta non pulvinar. Consequat id porta nibh venenatis cras sed. Id velit ut tortor pretium viverra suspendisse potenti. Sed id semper risus in. Sit amet nulla facilisi morbi. Iaculis urna id volutpat lacus. Nunc pulvinar sapien et ligula ullamcorper malesuada proin libero. Varius vel pharetra vel turpis nunc eget lorem dolor sed. Metus aliquam eleifend mi in nulla posuere sollicitudin. Magna fermentum iaculis eu non diam phasellus vestibulum lorem sed.</p>
+            </div>
         </div>
     </div>
 
@@ -29,7 +37,9 @@
 
     {% call macros.card() -%}
     <p>Another card here</p>
-    <a href="/" class="btn btn-primary">Go somewhere</a>
+    <div id="response"></div>
+    <div id="temporary">I'm going to keep you occupied</div>
+    <button class="btn btn-primary" id="clickMe">Click Me!</button>
     {%- endcall %}
 
     <p></p>
@@ -46,5 +56,74 @@
 {% endblock %}
 
 {% block morescripts %}
+<script type="text/javascript">
+
+    $(".alert").fadeOut(2500);
+
+    $("#temporary").hide();
+    $("#clickMe").click(function(){
+        $("#response").html("");
+        $.ajax({url: "/slow_response", method: "GET"})
+        .done(function(res){
+            $("#temporary").hide();
+            console.log(res);
+            $("#response").html(res);
+        })
+        $("#temporary").show();
+    });
+
+
+    var ready = {'username': false, 'password': false, 'confirm': false};
+
+    function set_readiness(field, text) {
+        if (text.includes("text-success")) {
+            ready[field] = true;
+        } else {
+            ready[field] = false;
+        }
+    }
+
+    function is_all_ready() {
+        for (key in ready) {
+            if (ready[key] == false) { return false; }
+        }
+        return true;
+    }
+
+    function set_register_state() {
+        if (is_all_ready()) {
+            $("#register").attr("disabled", false);
+        } else {
+            $("#register").attr("disabled", true);
+        }
+    }
+
+    $(".form-realtime-response").html("");
+    $("#register").attr("disabled", true);
+    $("#input_username").keyup(function(){
+        var data = $("#regnForm").serialize();
+        $.ajax({url: '/_username', method: 'POST', data: data}).done(function(response){
+            $("#response-realtime-username").html(response);
+            set_readiness('username', response);
+            set_register_state();
+        });
+    });
+    $("#input_password").keyup(function(){
+        var data = $("#regnForm").serialize();
+        $.ajax({url: '/_password', method: 'POST', data: data}).done(function(response){
+            $("#response-realtime-password").html(response);
+            set_readiness('password', response);
+            set_register_state();
+        });
+    });
+    $("#input_confirm").keyup(function(){
+        var data = $("#regnForm").serialize();
+        $.ajax({url: '/_confirm', method: 'POST', data: data}).done(function(response){
+            $("#response-realtime-confirm").html(response);
+            set_readiness('confirm', response);
+            set_register_state();
+        });
+    });
+</script>
 {% endblock %}
 

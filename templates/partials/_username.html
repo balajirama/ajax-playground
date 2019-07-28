@@ -1,0 +1,9 @@
+{% if not long_enough %}
+    <p class="small text-danger">Username too short</p>
+{% else %}
+    {% if is_available %}
+        <p class="small text-success">Username available</p>
+    {% else %}
+        <p class="small text-danger">Username already taken</p>
+    {% endif %}
+{% endif %}
