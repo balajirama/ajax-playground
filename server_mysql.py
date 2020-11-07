@@ -60,5 +60,13 @@ def _confirm():
     confirmation = request.form['password'] == request.form['confirm']
     return render_template("partials/_confirm.html", confirmation=confirmation)
 
+@app.route('/usersearch')
+def usersearch():
+    searchinp = request.args.get('search')
+    searchoutp = []
+    for i in range(10):
+        searchoutp.append({'text': 'Funny how you search for '+searchinp, 'link': '/link/'+str(i)})
+    return render_template("partials/search_result.html", searchoutp=searchoutp)
+
 if __name__ == "__main__":
     app.run(debug=True)

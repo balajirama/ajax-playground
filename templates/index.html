@@ -12,6 +12,24 @@
 
     {# This is an example call to the card() macro #}
     {# You can choose to not specify an image or width #}
+
+    <div class="row">
+        <div class="col"></div>
+        <div class="col text-right">
+            <form action="/usersearch" method="GET" id="searchForm">
+                {{ macros.inputfield(name='search', label='') }}
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+    <div class="container" id="search-results">
+        {% for result in searchoutp %}
+            <div>
+                <h5><a href="{{result['link']}}">{{result['text']}}</a></h5>
+            </div>
+        {% endfor %}
+    </div>
+
     <div class="row">
         <div class="col my-4">
             {% call macros.card(header='Card hearder', title='Card title', footer='some footer', img={'src': 'static/img/nothing.png', 'alt': 'nothing'}, width='15rem') -%}
@@ -124,6 +142,21 @@
             set_register_state();
         });
     });
+
+    $("#input_search").keyup(function(){
+        var data = $("#searchForm").serialize();
+        $.ajax({url: '/usersearch', method: 'GET', data: data}).done(function(response){
+            $("#search-results").html(response)
+        });
+    });
+
+    $("#searchForm").submit(function(){
+        $.ajax({url: $(this).attr("action") , method: 'GET', data: $(this).serialize()}).done(function(response) {
+            $("#search-results").html(response)
+        });
+        return false;
+    })
+
 </script>
 {% endblock %}
 
